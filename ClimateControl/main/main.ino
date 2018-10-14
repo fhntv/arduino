@@ -10,6 +10,11 @@ float RoomOut = 0;
 float OtsideIn = 0;
 float OtsideOUT = 0;
 
+int InFanPin = 7;
+int OutFanPin = 8;
+int InFanPinPWM = 9;
+int OutFanPinPWM = 10;
+
 
 // указаем к каким пинам подключен дисплей
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
@@ -63,6 +68,16 @@ void setup()
   lcd.createChar(2, ToiletUp);
   lcd.createChar(3, RoomeDown);
 
+  pinMode(InFanPin, OUTPUT);
+  pinMode(OutFanPin, OUTPUT);
+  pinMode(InFanPinPWM, OUTPUT);
+  pinMode(OutFanPinPWM, OUTPUT);
+  
+  digitalWrite(InFanPin, HIGH);
+  digitalWrite(OutFanPin, HIGH);
+  analogWrite(InFanPinPWM, 100);
+  analogWrite(OutFanPinPWM, 50);
+
   lcd.setCursor(4, 0);
   lcd.print("Welcome");  
 
@@ -81,12 +96,16 @@ void setup()
 void loop() 
 {
   float KPD=0;
+  int dtin=0;
+  int dtout=0;
   sensors.refreshSensorValues();
   RoomIn = sensors.getRoomInTemp();
   RoomOut = sensors.getRoomOutTemp();
   OtsideIn = sensors.getOtsideInTemp();
   OtsideOUT = sensors.getOtsideOUTTemp();
   KPD = (RoomIn-OtsideIn)/(RoomOut-OtsideIn)*100;
+  dtin = RoomOut - OtsideOUT;
+  dtout = RoomIn - OtsideIn;
 
 
  lcd.setCursor(0, 0);
@@ -99,13 +118,19 @@ void loop()
   lcd.print(OtsideOUT,1);  
   lcd.print(" ");  
   lcd.print(KPD,0);  
+  lcd.print("%  ");  
 
   
-  lcd.setCursor(0, 1);  // сиавим курсор во вторую строку 
+  lcd.setCursor(0, 1);  
   lcd.write(byte(3));
   lcd.print(RoomIn,1); 
   lcd.setCursor(6, 1);  
   lcd.write(byte(1)); 
   lcd.print(OtsideIn,1);  
+  lcd.print(" ");  
+  lcd.print(dtout,1);  
+  lcd.print(" ");  
+  lcd.print(dtin,1);  
+  lcd.print(" ");  
 
 }
